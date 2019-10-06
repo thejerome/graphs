@@ -8,6 +8,8 @@ public interface Graph<T> {
 
     boolean addEdge(T start, T end);
 
+    boolean edgeExists(T start, T end);
+
     List<Edge<T>> getPath(T start, T end);
 
     static <T> Graph<T> createUndirected() {
