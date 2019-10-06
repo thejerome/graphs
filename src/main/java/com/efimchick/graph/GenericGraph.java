@@ -15,7 +15,7 @@ import one.util.streamex.StreamEx;
 
 abstract class GenericGraph<T> implements Graph<T> {
 
-    protected final Map<T, Set<T>> adjLists = new LinkedHashMap<>();
+    final Map<T, Set<T>> adjLists = new LinkedHashMap<>();
 
     @Override
     public boolean addVertex(final T vertex) {
@@ -39,6 +39,17 @@ abstract class GenericGraph<T> implements Graph<T> {
     }
 
     @Override
+    public boolean edgeExists(final T start, final T end) {
+        requireNonNull(start);
+        requireNonNull(end);
+
+        requireNonNull(adjLists.get(start));
+        requireNonNull(adjLists.get(end));
+
+        return adjLists.get(start).contains(end);
+    }
+
+    @Override
     public List<Edge<T>> getPath(final T start, final T end) {
         requireNonNull(start);
         requireNonNull(end);
@@ -47,7 +58,7 @@ abstract class GenericGraph<T> implements Graph<T> {
         requireNonNull(adjLists.get(end));
 
         Deque<T> path = new LinkedList<>();
-        if (dfs(start, end, path)) {
+        if (searchPath(start, end, path)) {
             return StreamEx.of(path.stream()).pairMap(Edge::new).collect(Collectors.toList());
         }
 
@@ -56,27 +67,22 @@ abstract class GenericGraph<T> implements Graph<T> {
 
     protected abstract boolean fillAdjLists(final T start, final T end);
 
-    private boolean dfs(final T start, final T end, Deque<T> path) {
+    private boolean searchPath(final T start, final T end, Deque<T> path) {
         path.addLast(start);
 
-        if (edgeExists(start, end)) {
-            path.add(end);
+        if (start.equals(end)) {
             return true;
         }
 
         final boolean pathIsFound = adjLists.get(start).stream()
                 .filter(adj -> !path.contains(adj))
-                .anyMatch(adj -> dfs(adj, end, path));
+                .anyMatch(adj -> searchPath(adj, end, path));
 
         if (!pathIsFound) {
             path.removeLast();
         }
         return pathIsFound;
 
-    }
-
-    private boolean edgeExists(final T start, final T end) {
-        return adjLists.get(start).contains(end);
     }
 
     @Override
