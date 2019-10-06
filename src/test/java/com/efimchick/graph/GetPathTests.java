@@ -1,11 +1,15 @@
 package com.efimchick.graph;
 
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -14,59 +18,55 @@ import org.junit.Test;
 public class GetPathTests {
 
     @Test
-    public void getPathDirectedGraphTest() throws Exception {
+    public void getPathDirectedGraphTest() {
         final Graph<String> graph = Graph.createDirected();
         fillGraph(graph, "sample.graph", Function.identity());
 
-        assertEquals("[1-3, 3-6, 6-11, 11-12]", graph.getPath("1", "12").toString());
-        assertEquals("[1-3, 3-6, 6-11]", graph.getPath("1", "11").toString());
-        assertEquals("[1-3, 3-6, 6-11, 11-10]", graph.getPath("1", "10").toString());
-
-        assertEquals("[2-6, 6-11]", graph.getPath("2", "11").toString());
-        assertEquals("[5-11, 11-12]", graph.getPath("5", "12").toString());
-        assertEquals("[3-6, 6-1]", graph.getPath("3", "1").toString());
+        for (int i = 1; i <= 12; i++) {
+            for (int j = 1; j <= 12; j++) {
+                if (i == j) continue;
+                checkPath(graph, String.valueOf(i), String.valueOf(j));
+            }
+        }
     }
 
     @Test
-    public void getPathUndirectedGraphTest() throws Exception {
+    public void getPathUndirectedGraphTest() {
         final Graph<String> graph = Graph.createUndirected();
         fillGraph(graph, "sample.graph", Function.identity());
 
-        assertEquals("[1-12]", graph.getPath("1", "12").toString());
-        assertEquals("[1-3, 3-6, 6-11]", graph.getPath("1", "11").toString());
-        assertEquals("[1-3, 3-6, 6-10]", graph.getPath("1", "10").toString());
-
-        assertEquals("[2-6, 6-11]", graph.getPath("2", "11").toString());
-        assertEquals("[5-3, 3-1, 1-12]", graph.getPath("5", "12").toString());
-        assertEquals("[3-1]", graph.getPath("3", "1").toString());
+        for (int i = 1; i <= 12; i++) {
+            for (int j = 1; j <= 12; j++) {
+                if (i == j) continue;
+                checkPath(graph, String.valueOf(i), String.valueOf(j));
+            }
+        }
     }
 
     @Test
-    public void getPathDirectedGraphIntTest() throws Exception {
+    public void getPathDirectedGraphIntTest() {
         final Graph<Integer> graph = Graph.createDirected();
         fillGraph(graph, "sample.graph", Integer::parseInt);
 
-        assertEquals("[1-3, 3-6, 6-11, 11-12]", graph.getPath(1, 12).toString());
-        assertEquals("[1-3, 3-6, 6-11]", graph.getPath(1, 11).toString());
-        assertEquals("[1-3, 3-6, 6-11, 11-10]", graph.getPath(1, 10).toString());
-
-        assertEquals("[2-6, 6-11]", graph.getPath(2, 11).toString());
-        assertEquals("[5-11, 11-12]", graph.getPath(5, 12).toString());
-        assertEquals("[3-6, 6-1]", graph.getPath(3, 1).toString());
+        for (int i = 1; i <= 12; i++) {
+            for (int j = 1; j <= 12; j++) {
+                if (i == j) continue;
+                checkPath(graph, i, j);
+            }
+        }
     }
 
     @Test
-    public void getPathUndirectedGraphIntTest() throws Exception {
+    public void getPathUndirectedGraphIntTest() {
         final Graph<Integer> graph = Graph.createUndirected();
         fillGraph(graph, "sample.graph", Integer::parseInt);
 
-        assertEquals("[1-12]", graph.getPath(1, 12).toString());
-        assertEquals("[1-3, 3-6, 6-11]", graph.getPath(1, 11).toString());
-        assertEquals("[1-3, 3-6, 6-10]", graph.getPath(1, 10).toString());
-
-        assertEquals("[2-6, 6-11]", graph.getPath(2, 11).toString());
-        assertEquals("[5-3, 3-1, 1-12]", graph.getPath(5, 12).toString());
-        assertEquals("[3-1]", graph.getPath(3, 1).toString());
+        for (int i = 1; i <= 12; i++) {
+            for (int j = 1; j <= 12; j++) {
+                if (i == j) continue;
+                checkPath(graph, i, j);
+            }
+        }
     }
 
     @Test
@@ -74,12 +74,12 @@ public class GetPathTests {
         final Graph<Integer> graph = Graph.createUndirected();
         fillGraph(graph, "ring.graph", Integer::parseInt);
 
-        assertEquals("[1-2]", graph.getPath(1, 2).toString());
-        assertEquals("[1-12]", graph.getPath(1, 12).toString());
-        assertEquals("[7-6, 6-5, 5-4, 4-3]", graph.getPath(7, 3).toString());
-        assertEquals("[11-10, 10-9, 9-8, 8-7, 7-6, 6-5, 5-4, 4-3]", graph.getPath(11, 3).toString());
-        assertEquals("[5-6]", graph.getPath(5, 6).toString());
-        assertEquals("[5-4, 4-3, 3-2, 2-1, 1-12, 12-11, 11-10, 10-9, 9-8, 8-7]", graph.getPath(5, 7).toString());
+        for (int i = 1; i <= 12; i++) {
+            for (int j = 1; j <= 12; j++) {
+                if (i == j) continue;
+                checkPath(graph, i, j);
+            }
+        }
     }
 
     @Test
@@ -87,12 +87,12 @@ public class GetPathTests {
         final Graph<Integer> graph = Graph.createDirected();
         fillGraph(graph, "ring.graph", Integer::parseInt);
 
-        assertEquals("[1-12, 12-11, 11-10, 10-9, 9-8, 8-7, 7-6, 6-5, 5-4, 4-3, 3-2]", graph.getPath(1, 2).toString());
-        assertEquals("[1-12]", graph.getPath(1, 12).toString());
-        assertEquals("[7-6, 6-5, 5-4, 4-3]", graph.getPath(7, 3).toString());
-        assertEquals("[11-10, 10-9, 9-8, 8-7, 7-6, 6-5, 5-4, 4-3]", graph.getPath(11, 3).toString());
-        assertEquals("[5-4, 4-3, 3-2, 2-1, 1-12, 12-11, 11-10, 10-9, 9-8, 8-7, 7-6]", graph.getPath(5, 6).toString());
-        assertEquals("[5-4, 4-3, 3-2, 2-1, 1-12, 12-11, 11-10, 10-9, 9-8, 8-7]", graph.getPath(5, 7).toString());
+        for (int i = 1; i <= 12; i++) {
+            for (int j = 1; j <= 12; j++) {
+                if (i == j) continue;
+                checkPath(graph, i, j);
+            }
+        }
     }
 
     @Test(expected = GraphException.class)
@@ -131,6 +131,23 @@ public class GetPathTests {
         assertNotNull(graph.getPath(1, 4));
     }
 
+    private <T> void checkPath(Graph<T> graph, T start, T end) {
+        final List<Edge<T>> path = graph.getPath(start, end);
+        assertNotNull(path);
+        assertFalse(path.isEmpty());
+        assertEquals(start, path.get(0).start);
+        assertEquals(end, path.get(path.size() - 1).end);
+        for (Edge<T> edge : path) {
+            assertTrue(graph.edgeExists(edge.start, edge.end));
+        }
+        for (int i = 0; i < path.size() - 1; i++) {
+            final T currentEdgeEnd = path.get(i).end;
+            final T nextEdgeStart = path.get(i + 1).start;
+            assertEquals(currentEdgeEnd, nextEdgeStart);
+        }
+
+    }
+
     private <T> void fillGraph(Graph<T> graph, final String resourceName, final Function<String, T> parseFunction) {
         readResource(resourceName)
                 .forEach(line -> {
@@ -154,7 +171,7 @@ public class GetPathTests {
     private Stream<String> readResource(final String resourceName) {
         return new BufferedReader(
                 new InputStreamReader(
-                        getClass().getClassLoader().getResourceAsStream(resourceName))
+                        requireNonNull(getClass().getClassLoader().getResourceAsStream(resourceName)))
         ).lines();
     }
 }
